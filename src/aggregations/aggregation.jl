@@ -12,7 +12,7 @@ Flux.@functor Aggregation
 
 (a::Aggregation)(args...) = vcat([f(args...) for f in a.fs]...)
 
-(a::AggregationFunction)(x::ArrayNode, args...) = mapdata(x -> a(x, args...), x)
+#(a::AggregationFunction)(x::ArrayNode, args...) = mapdata(x -> a(x, args...), x)
 
 Base.show(io::IO, a::Union{AggregationFunction, Aggregation}) = modelprint(io, a)
 Base.getindex(a::Aggregation, i) = a.fs[i]
@@ -49,6 +49,9 @@ include("segmented_mean.jl")
 include("segmented_max.jl")
 include("segmented_pnorm.jl")
 include("segmented_lse.jl")
+(a::SegmentedMean)(x::ArrayNode, args...) = mapdata(x -> a(x, args...), x)
+(a::SegmentedMax)(x::ArrayNode, args...) = mapdata(x -> a(x, args...), x)
+(a::SegmentedSum)(x::ArrayNode, args...) = mapdata(x -> a(x, args...), x)
 
 export SegmentedSum, SegmentedMean, SegmentedMax, SegmentedPNorm, SegmentedLSE
 
