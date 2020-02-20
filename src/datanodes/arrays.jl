@@ -13,7 +13,9 @@ end
 ArrayNode(data::AbstractMatrix) = ArrayNode(data, nothing)
 # ArrayNode(data::AbstractNode, a...) = data
 
-mapdata(f, x::ArrayNode) = ArrayNode(f(x.data), x.metadata)
+Flux.@functor ArrayNode
+
+mapdata(f, x::ArrayNode) = ArrayNode(mapdata(f, x.data), x.metadata)
 
 Base.ndims(x::ArrayNode) = Colon()
 LearnBase.nobs(a::ArrayNode) = size(a.data, 2)

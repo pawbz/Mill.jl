@@ -69,7 +69,9 @@ end
     @test all(vcat(e, e).data .== vcat(e.data, e.data))
     x = ArrayNode(randn(2,3),rand(3))
     @test typeof(catobs(x,x[0:-1])) .== ArrayNode{Array{Float64,2},Array{Float64,1}}
+    @inferred catobs(x,x[0:-1]) == [1,2,3]
     @test typeof(reduce(catobs, [x, x[0:-1]])) .== ArrayNode{Array{Float64,2},Array{Float64,1}}
+    @inferred reduce(catobs, [x, x[0:-1]]) == [1,2,3]
     @test all(cat(e, e, dims = ndims(e)).data .== hcat(e.data, e.data))
 end
 
@@ -242,6 +244,14 @@ end
 
 @testset "testing sparsify and mapdata" begin
     x = TreeNode((TreeNode((ArrayNode(randn(5,5)), ArrayNode(zeros(5,5)))), ArrayNode(zeros(5,5))))
+    xs = mapdata(i -> sparsify(i, 0.05), x)
+    @test typeof(xs.data[2].data) <: SparseMatrixCSC
+    @test typeof(xs.data[1].data[2].data) <: SparseMatrixCSC
+    @test all(xs.data[1].data[1].data .== x.data[1].data[1].data)
+end
+
+@testset "testing missing mapdata" begin
+    x = TreeNode((TreeNode((ArrayNode(randn(5,5)), ArrayNode(zeros(5,5)))), ArrayNode(zeros(5,5))), BagNode(missing, AlignedBags([0:-1]), nothing))
     xs = mapdata(i -> sparsify(i, 0.05), x)
     @test typeof(xs.data[2].data) <: SparseMatrixCSC
     @test typeof(xs.data[1].data[2].data) <: SparseMatrixCSC
